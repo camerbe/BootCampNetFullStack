@@ -19,7 +19,19 @@ namespace BootCampDAL
                 .HasOne(p => p.User)
                 .WithOne()
                 .HasForeignKey<Patient>(p=>p.Id);
+
+            builder.Entity<Medecin>()
+                .HasOne(d => d.User)
+                .WithOne()
+                .HasForeignKey<Medecin>(d => d.Id);
+            
+            builder.Entity<Medecin>()
+                .HasOne(s => s.Specialite)
+                .WithOne()
+                .HasForeignKey<Medecin>(s => s.Id);
         }
         public DbSet<Patient> Patients { get; set; }
+        public DbSet<Medecin> Medecins { get; set; }
+        public DbSet<Specialite> Specialites { get; set; }
     }
 }
