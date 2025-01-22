@@ -5,6 +5,8 @@ VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BootCampNetFullStack", "BootCampNetFullStack.csproj", "{331C00A3-4700-443D-9D89-1894BA8E0E04}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BootCampDAL", "BootCampDAL\BootCampDAL.csproj", "{C212CA44-905D-4764-A008-A300C31A406A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{331C00A3-4700-443D-9D89-1894BA8E0E04}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{331C00A3-4700-443D-9D89-1894BA8E0E04}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{331C00A3-4700-443D-9D89-1894BA8E0E04}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C212CA44-905D-4764-A008-A300C31A406A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C212CA44-905D-4764-A008-A300C31A406A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C212CA44-905D-4764-A008-A300C31A406A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C212CA44-905D-4764-A008-A300C31A406A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
