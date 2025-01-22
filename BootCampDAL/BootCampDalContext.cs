@@ -1,4 +1,5 @@
 ﻿using BootCampDAL.Data.Models;
+using BootCampNetFullStack.BootCampDAL.Data.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +15,11 @@ namespace BootCampDAL
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+            builder.Entity<Patient>()
+                .HasOne(p => p.User)
+                .WithOne()
+                .HasForeignKey<Patient>(p=>p.Id);
         }
+        public DbSet<Patient> Patients { get; set; }
     }
 }
