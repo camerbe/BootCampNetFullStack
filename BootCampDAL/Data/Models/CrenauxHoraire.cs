@@ -27,7 +27,8 @@ namespace BootCampDAL.Data.Models
         public TimeSpan Debut { get; set; }
         public TimeSpan Fin { get; set; }
         public Guid MedecinId { get; set; }
-        
+        [ForeignKey("MedecinId")]
+        public Medecin Medecin { get; set; }
 
     }
 }

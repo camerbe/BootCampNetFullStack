@@ -14,8 +14,9 @@ namespace BootCampDAL.Data.Models
         public Guid Id { get; set; }
         public string? Inami  { get; set; }
         public Guid? SpecialiteId { get; set; }
+        [ForeignKey("SpecialiteId")]
         public Specialite Specialite { get; set; }
-        public CrenauxHoraire CrenauxHoraire { get; set; }
+        //public CrenauxHoraire CrenauxHoraire { get; set; }
         public User User { get; set; }
     }
 }

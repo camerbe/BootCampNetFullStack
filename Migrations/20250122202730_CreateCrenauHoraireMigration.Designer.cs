@@ -4,6 +4,7 @@ using BootCampDAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BootCampNetFullStack.Migrations
 {
     [DbContext(typeof(BootCampDalContext))]
-    partial class BootCampDalContextModelSnapshot : ModelSnapshot
+    [Migration("20250122202730_CreateCrenauHoraireMigration")]
+    partial class CreateCrenauHoraireMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -42,9 +45,10 @@ namespace BootCampNetFullStack.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("MedecinId");
+                    b.HasIndex("MedecinId")
+                        .IsUnique();
 
-                    b.ToTable("CrenauxHoraires");
+                    b.ToTable("CrenauxHoraire");
                 });
 
             modelBuilder.Entity("BootCampDAL.Data.Models.Medecin", b =>
@@ -336,8 +340,8 @@ namespace BootCampNetFullStack.Migrations
             modelBuilder.Entity("BootCampDAL.Data.Models.CrenauxHoraire", b =>
                 {
                     b.HasOne("BootCampDAL.Data.Models.Medecin", "Medecin")
-                        .WithMany()
-                        .HasForeignKey("MedecinId")
+                        .WithOne("CrenauxHoraire")
+                        .HasForeignKey("BootCampDAL.Data.Models.CrenauxHoraire", "MedecinId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -434,6 +438,12 @@ namespace BootCampNetFullStack.Migrations
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("BootCampDAL.Data.Models.Medecin", b =>
+                {
+                    b.Navigation("CrenauxHoraire")
                         .IsRequired();
                 });
 

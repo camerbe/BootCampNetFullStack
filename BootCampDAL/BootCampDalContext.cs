@@ -33,5 +33,6 @@ namespace BootCampDAL
         public DbSet<Patient> Patients { get; set; }
         public DbSet<Medecin> Medecins { get; set; }
         public DbSet<Specialite> Specialites { get; set; }
+        public DbSet<CrenauxHoraire> CrenauxHoraires { get; set; }
     }
 }
