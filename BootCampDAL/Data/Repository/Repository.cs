@@ -23,31 +23,37 @@ namespace BootCampDAL.Data.Repository
         public async Task<T> Add(T entity)
         {
              await _db.AddAsync(entity);
+             return entity;
         }
 
         public async Task<IEnumerable<T>> AddRange(T entity)
         {
-             await _db.AddRangeAsync(entity);    
+             await _db.AddRangeAsync(entity);
+             return (IEnumerable<T>)entity;
         }
 
-        public Task<T> Get(Expression<Func<T, bool>> expression, List<string> includes)
+        public async Task<T> Get(Expression<Func<T, bool>> expression)
         {
-            throw new NotImplementedException();
+            IQueryable<T> queryable = _db;
+            queryable= queryable.Where(expression);
+            return queryable.FirstOrDefault();
         }
 
-        public Task<IEnumerable<T>> GetAll(Expression<Func<T, bool>> expression = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null, List<string> includes = null)
+        public async Task<IEnumerable<T>> GetAll()
         {
-            throw new NotImplementedException();
+            IQueryable<T> queryable = _db;
+            return queryable.ToList();
         }
 
-        public Task Remove(T entity)
+        public async Task Remove(T entity)
         {
-            throw new NotImplementedException();
+            _db.Remove(entity);
+            
         }
 
-        public Task RemoveRange(IEnumerable<T> entity)
+        public async Task RemoveRange(IEnumerable<T> entity)
         {
-            throw new NotImplementedException();
+            _db.RemoveRange(entity);    
         }
     }
 }

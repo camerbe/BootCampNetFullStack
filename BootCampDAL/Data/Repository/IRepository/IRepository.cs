@@ -10,11 +10,8 @@ namespace BootCampDAL.Data.Repository.IRepository
 {
     public interface IRepository<T> where T : class 
     {
-        Task<IEnumerable<T>>GetAll(Expression<Func<T,bool>> expression=null,
-            Func<IQueryable<T>,IOrderedQueryable<T>> orderBy=null,
-            List<string> includes=null
-            );
-        Task<T> Get(Expression<Func<T, bool>> expression, List<string> includes);
+        Task<IEnumerable<T>> GetAll();
+        Task<T> Get(Expression<Func<T, bool>> expression);
         Task<T> Add(T entity);
         Task<IEnumerable<T>> AddRange(T entity);
         Task Remove(T entity);

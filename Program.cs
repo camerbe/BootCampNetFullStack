@@ -1,5 +1,7 @@
 using BootCampDAL;
 using BootCampDAL.Data.Models;
+using BootCampDAL.Data.Repository;
+using BootCampDAL.Data.Repository.IRepository;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,6 +13,7 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<BootCampDalContext>(options=>options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")
     ));
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 //Add Authentication
 builder.Services.AddAuthentication();
 builder.Services.AddIdentityCore<User>(q =>
