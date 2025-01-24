@@ -14,8 +14,8 @@ namespace BootCampDAL.Data.Repository.IRepository
         Task<T> Get(Expression<Func<T, bool>> expression);
         Task<T> Add(T entity);
         Task<IEnumerable<T>> AddRange(T entity);
-        Task Remove(T entity);
-        Task RemoveRange(IEnumerable<T> entity);
+        Task Remove(Guid id);
+        void RemoveRange(IEnumerable<T> entity);
 
 
     }

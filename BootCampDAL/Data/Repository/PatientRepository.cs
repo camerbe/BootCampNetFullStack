@@ -1,5 +1,7 @@
-﻿using BootCampDAL.Data.Repository.IRepository;
+﻿using BootCampDAL.Data.Models;
+using BootCampDAL.Data.Repository.IRepository;
 using BootCampNetFullStack.BootCampDAL.Data.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,10 +19,16 @@ namespace BootCampDAL.Data.Repository
             _context = context;
         }
 
-        Task  IPatientRepository.Update(Patient patient)
+        public async Task Update(Patient patient)
         {
-            _context.Patients.Update(patient);
-            return Task.CompletedTask;
+            _context.Patients.Attach(patient);
+            _context.Entry(patient).State = EntityState.Modified;
         }
+
+        //Task  IPatientRepository.Update(Patient patient)
+        //{
+        //    _context.Patients.Update(patient);
+        //    return Task.CompletedTask;
+        //}
     }
 }

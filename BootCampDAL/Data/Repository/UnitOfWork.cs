@@ -26,10 +26,16 @@ namespace BootCampDAL.Data.Repository
         public IUserRepository User { get; private set; }
         public IMedecinRepository Medecin { get; private set; }
 
-        Task IUnitOfWork.Save()
+        void IDisposable.Dispose()
         {
-            _context.SaveChangesAsync();
-            return Task.CompletedTask;
+           _context.Dispose();
+            GC.SuppressFinalize(this);
+        }
+
+        async Task IUnitOfWork.Save()
+        {
+           await  _context.SaveChangesAsync();
+           
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using BootCampDAL.Data.Models;
 using BootCampDAL.Data.Repository.IRepository;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,11 +17,12 @@ namespace BootCampDAL.Data.Repository
             _context = context;
         }
 
-        Task  IUserRepository.Update(User user)
+        public async Task Update(User user)
         {
-           _context.Users.Update(user);
-            return Task.CompletedTask;
+            _context.Users.Attach(user);
+            _context.Entry(user).State = EntityState.Modified;
 
-        }
+        }   
+
     }
 }

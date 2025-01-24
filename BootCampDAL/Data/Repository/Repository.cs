@@ -45,15 +45,16 @@ namespace BootCampDAL.Data.Repository
             return queryable.ToList();
         }
 
-        public async Task Remove(T entity)
+        async Task IRepository<T>.Remove(Guid id)
         {
+            var entity=await _db.FindAsync(id);
             _db.Remove(entity);
-            
         }
 
-        public async Task RemoveRange(IEnumerable<T> entity)
+        
+        void IRepository<T>.RemoveRange(IEnumerable<T> entity)
         {
-            _db.RemoveRange(entity);    
+             _db.RemoveRange(entity);
         }
     }
 }
