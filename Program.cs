@@ -26,6 +26,7 @@ builder.Services.AddIdentityCore<User>(q =>
         q.SignIn.RequireConfirmedEmail = true;
     })
     .AddEntityFrameworkStores<BootCampDalContext>()
+        
         .AddSignInManager<SignInManager<User>>()
         .AddUserManager<UserManager<User>>()
         .AddDefaultTokenProviders();
