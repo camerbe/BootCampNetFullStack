@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BootCampDAL
 {
-    public class BootCampDalContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
+    public class BootCampDalContext : IdentityDbContext<User,IdentityRole<Guid>,Guid, IdentityUserClaim<Guid>, IdentityUserRole<Guid>, IdentityUserLogin<Guid>, IdentityRoleClaim<Guid>, IdentityUserToken<Guid>>
     {
         public BootCampDalContext(DbContextOptions<BootCampDalContext> options) : base(options)
         {
@@ -15,6 +15,8 @@ namespace BootCampDAL
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+            builder.ApplyConfiguration(new RoleConfiguration());
+
             builder.Entity<Patient>()
                 .HasOne(p => p.User)
                 .WithOne()
@@ -29,6 +31,14 @@ namespace BootCampDAL
                 .HasOne(s => s.Specialite)
                 .WithOne()
                 .HasForeignKey<Medecin>(s => s.Id);
+
+
+            builder.Entity<IdentityUserRole<Guid>>();
+            builder.Entity<IdentityUserClaim<Guid>>();
+            builder.Entity<IdentityUserLogin<Guid>>();
+            builder.Entity<IdentityUserToken<Guid>>();
+            builder.Entity<IdentityRoleClaim<Guid>>();
+
         }
         public DbSet<Patient> Patients { get; set; }
         public DbSet<Medecin> Medecins { get; set; }

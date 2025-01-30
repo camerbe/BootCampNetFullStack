@@ -4,6 +4,7 @@ using BootCampDAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BootCampNetFullStack.Migrations
 {
     [DbContext(typeof(BootCampDalContext))]
-    partial class BootCampDalContextModelSnapshot : ModelSnapshot
+    [Migration("20250125005323_UpdateUser")]
+    partial class UpdateUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -228,29 +231,25 @@ namespace BootCampNetFullStack.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("39867fb0-be52-4058-9d1c-2019c2ce9dda"),
-                            ConcurrencyStamp = "39867fb0-be52-4058-9d1c-2019c2ce9dda",
+                            Id = new Guid("17122a03-38ba-4548-9fcc-b10e45fb8f63"),
                             Name = "Medecin",
                             NormalizedName = "MEDECIN"
                         },
                         new
                         {
-                            Id = new Guid("04b71631-d442-4413-9974-11cd7b808439"),
-                            ConcurrencyStamp = "42b6ed45-bcb2-4555-b21b-8da405d0496f",
+                            Id = new Guid("5b7a2d91-2250-4169-bea2-8bf0c2010042"),
                             Name = "Patient",
                             NormalizedName = "PATIENT"
                         },
                         new
                         {
-                            Id = new Guid("3f830736-30d6-4ea9-890b-1ad8389c6e66"),
-                            ConcurrencyStamp = "3f830736-30d6-4ea9-890b-1ad8389c6e66",
+                            Id = new Guid("e4501398-c6eb-4e5b-ae51-1f633d10aba6"),
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = new Guid("5f000235-4cb6-46d3-9c82-fcc37aae7ec0"),
-                            ConcurrencyStamp = "5f000235-4cb6-46d3-9c82-fcc37aae7ec0",
+                            Id = new Guid("936633a7-d2d8-49bc-9252-44f861caa6ce"),
                             Name = "Secretaire",
                             NormalizedName = "SECRETAIRE"
                         });

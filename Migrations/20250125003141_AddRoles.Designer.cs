@@ -4,6 +4,7 @@ using BootCampDAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BootCampNetFullStack.Migrations
 {
     [DbContext(typeof(BootCampDalContext))]
-    partial class BootCampDalContextModelSnapshot : ModelSnapshot
+    [Migration("20250125003141_AddRoles")]
+    partial class AddRoles
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -148,6 +151,10 @@ namespace BootCampNetFullStack.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
@@ -228,29 +235,25 @@ namespace BootCampNetFullStack.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("39867fb0-be52-4058-9d1c-2019c2ce9dda"),
-                            ConcurrencyStamp = "39867fb0-be52-4058-9d1c-2019c2ce9dda",
+                            Id = new Guid("76574bc6-100f-4aaa-8116-393cdee3f866"),
                             Name = "Medecin",
                             NormalizedName = "MEDECIN"
                         },
                         new
                         {
-                            Id = new Guid("04b71631-d442-4413-9974-11cd7b808439"),
-                            ConcurrencyStamp = "42b6ed45-bcb2-4555-b21b-8da405d0496f",
+                            Id = new Guid("13e493de-1070-4d6d-a900-f080bd7d8324"),
                             Name = "Patient",
                             NormalizedName = "PATIENT"
                         },
                         new
                         {
-                            Id = new Guid("3f830736-30d6-4ea9-890b-1ad8389c6e66"),
-                            ConcurrencyStamp = "3f830736-30d6-4ea9-890b-1ad8389c6e66",
+                            Id = new Guid("9ae71992-233c-4ead-8136-dc4d20f04678"),
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = new Guid("5f000235-4cb6-46d3-9c82-fcc37aae7ec0"),
-                            ConcurrencyStamp = "5f000235-4cb6-46d3-9c82-fcc37aae7ec0",
+                            Id = new Guid("3f4074b6-670b-4131-91eb-c35e0bdbfae8"),
                             Name = "Secretaire",
                             NormalizedName = "SECRETAIRE"
                         });

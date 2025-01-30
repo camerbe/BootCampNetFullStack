@@ -21,6 +21,6 @@ namespace BootCampDAL.Data.DTO
         public DateTime? LastUpdatedAt { get; set; }
         public bool IsActive { get; set; } = false;
         public string Tel { get; set; }=string.Empty;
-        public ICollection<string> Roles { get; set; }
+        public string Role { get; set; }
     }
 }
