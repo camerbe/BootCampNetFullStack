@@ -2,9 +2,11 @@ using BootCampDAL;
 using BootCampDAL.Data.Models;
 using BootCampDAL.Data.Repository;
 using BootCampDAL.Data.Repository.IRepository;
+using BootCampNetFullStack.Mappings;
 using BootCampNetFullStack.Middlewares;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,7 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 var logger = new LoggerConfiguration()
-    .WriteTo.Console()
+    //.WriteTo.Console()
     .WriteTo.File("Logs/BootCamp_log.log",rollingInterval:RollingInterval.Day)
     .MinimumLevel.Information()
     .CreateBootstrapLogger();
@@ -57,7 +59,7 @@ builder.Services.Configure<IdentityOptions>(q =>
 //    .AddDefaultTokenProviders();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-
+//builder.Services.AddAutoMapper<AutoMapperProfile>();
 
 //Add Authentication
 builder.Services.AddAuthentication();

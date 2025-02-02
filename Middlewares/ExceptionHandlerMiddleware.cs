@@ -6,6 +6,7 @@ namespace BootCampNetFullStack.Middlewares
     {
         private readonly ILogger<ExceptionHandlerMiddleware> _logger;
         private readonly RequestDelegate _next;
+        //private HttpContext httpContext;
 
         public ExceptionHandlerMiddleware(
             ILogger<ExceptionHandlerMiddleware> logger,
@@ -16,10 +17,11 @@ namespace BootCampNetFullStack.Middlewares
             _next = next;
         }
 
-        public async Task Handle(HttpContext httpContext)
+        public async Task InvokeAsync(HttpContext httpContext)
         {
-            try { 
-               await _next(httpContext);
+            try
+            {
+                await _next(httpContext);
             }
             catch(Exception ex) { 
                 var errorId=Guid.NewGuid().ToString();
