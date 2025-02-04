@@ -13,6 +13,6 @@ namespace BootCampNetFullStack.BootCampDAL.Data.DTO
         public DateTime Dob { get; set; }
         public string? Addresse { get; set; }
         public bool IsRegistered { get; set; }
-        
+        //public UserDTO User { get; set; }
     }
 }

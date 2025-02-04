@@ -1,11 +1,11 @@
 ﻿using BootCampDAL.Data.DTO;
-using BootCampDAL.Service;
 using BootCampDAL.Data.Models;
 using BootCampDAL.Data.Repository.IRepository;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using BootCampNetFullStack.BootCampDAL.Data.DTO;
+using BootCampNetFullStack.Extensions;
 
 namespace BootCampNetFullStack.Controllers
 {
@@ -64,8 +64,8 @@ namespace BootCampNetFullStack.Controllers
             }
             var user = new User
             {
-                Nom = usrdto.Nom.ToUpper(),
-                Prenom = StringFormatter.ToTitleCase(usrdto.Prenom),
+                Nom = usrdto.Nom.ToUpperCase(),
+                Prenom = usrdto.Prenom.Capitalize(),
                 CreatedAt = usrdto.CreatedAt,
                 LastUpdatedAt = usrdto.LastUpdatedAt,
                 IsActive = usrdto.IsActive,
