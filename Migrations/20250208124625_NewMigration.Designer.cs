@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BootCampNetFullStack.Migrations
 {
     [DbContext(typeof(BootCampDalContext))]
-    [Migration("20250122155458_firstmigration")]
-    partial class firstmigration
+    [Migration("20250208124625_NewMigration")]
+    partial class NewMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,101 @@ namespace BootCampNetFullStack.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("BootCampDAL.Data.Models.CrenauxHoraire", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<TimeSpan>("Debut")
+                        .HasColumnType("time");
+
+                    b.Property<TimeSpan>("Fin")
+                        .HasColumnType("time");
+
+                    b.Property<Guid>("MedecinId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MedecinId");
+
+                    b.ToTable("CrenauxHoraires");
+                });
+
+            modelBuilder.Entity("BootCampDAL.Data.Models.Medecin", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Inami")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("SpecialiteId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SpecialiteId");
+
+                    b.ToTable("Medecins");
+                });
+
+            modelBuilder.Entity("BootCampDAL.Data.Models.RendezVous", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("DateRdv")
+                        .HasColumnType("datetime2");
+
+                    b.Property<TimeSpan>("Debut")
+                        .HasColumnType("time");
+
+                    b.Property<TimeSpan>("Fin")
+                        .HasColumnType("time");
+
+                    b.Property<Guid?>("MedecinId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("PatientId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Statut")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MedecinId");
+
+                    b.HasIndex("PatientId");
+
+                    b.ToTable("RendezVous");
+                });
+
+            modelBuilder.Entity("BootCampDAL.Data.Models.Specialite", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Titre")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Specialites");
+                });
 
             modelBuilder.Entity("BootCampDAL.Data.Models.User", b =>
                 {
@@ -85,11 +180,10 @@ namespace BootCampNetFullStack.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Role")
-                        .IsRequired()
+                    b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("SecurityStamp")
+                    b.Property<string>("Tel")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("TwoFactorEnabled")
@@ -262,11 +356,58 @@ namespace BootCampNetFullStack.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("BootCampDAL.Data.Models.CrenauxHoraire", b =>
+                {
+                    b.HasOne("BootCampDAL.Data.Models.Medecin", "Medecin")
+                        .WithMany()
+                        .HasForeignKey("MedecinId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Medecin");
+                });
+
+            modelBuilder.Entity("BootCampDAL.Data.Models.Medecin", b =>
+                {
+                    b.HasOne("BootCampDAL.Data.Models.User", "User")
+                        .WithMany("Medecins")
+                        .HasForeignKey("Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BootCampDAL.Data.Models.Specialite", "Specialite")
+                        .WithMany("Medecins")
+                        .HasForeignKey("SpecialiteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Specialite");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BootCampDAL.Data.Models.RendezVous", b =>
+                {
+                    b.HasOne("BootCampDAL.Data.Models.Medecin", "Medecin")
+                        .WithMany("RendezVous")
+                        .HasForeignKey("MedecinId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("BootCampNetFullStack.BootCampDAL.Data.Models.Patient", "Patient")
+                        .WithMany("RendezVous")
+                        .HasForeignKey("PatientId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("Medecin");
+
+                    b.Navigation("Patient");
+                });
+
             modelBuilder.Entity("BootCampNetFullStack.BootCampDAL.Data.Models.Patient", b =>
                 {
                     b.HasOne("BootCampDAL.Data.Models.User", "User")
-                        .WithOne()
-                        .HasForeignKey("BootCampNetFullStack.BootCampDAL.Data.Models.Patient", "Id")
+                        .WithMany("Patients")
+                        .HasForeignKey("Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -322,6 +463,28 @@ namespace BootCampNetFullStack.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("BootCampDAL.Data.Models.Medecin", b =>
+                {
+                    b.Navigation("RendezVous");
+                });
+
+            modelBuilder.Entity("BootCampDAL.Data.Models.Specialite", b =>
+                {
+                    b.Navigation("Medecins");
+                });
+
+            modelBuilder.Entity("BootCampDAL.Data.Models.User", b =>
+                {
+                    b.Navigation("Medecins");
+
+                    b.Navigation("Patients");
+                });
+
+            modelBuilder.Entity("BootCampNetFullStack.BootCampDAL.Data.Models.Patient", b =>
+                {
+                    b.Navigation("RendezVous");
                 });
 #pragma warning restore 612, 618
         }

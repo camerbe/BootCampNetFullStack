@@ -10,13 +10,15 @@ namespace BootCampDAL.Data.Models
 {
     public class Medecin
     {
-        [Key, ForeignKey("User")]
+        [Key, ForeignKey(nameof(User))]
         public Guid Id { get; set; }
         public string? Inami  { get; set; }
-        public Guid? SpecialiteId { get; set; }
-        [ForeignKey("SpecialiteId")]
+        [ForeignKey(nameof(Specialite))]
+        public Guid SpecialiteId { get; set; }
+        
         public Specialite Specialite { get; set; }
         //public CrenauxHoraire CrenauxHoraire { get; set; }
         public User User { get; set; }
+        public IEnumerable<RendezVous>? RendezVous { get; set; }
     }
 }

@@ -6,6 +6,7 @@ using BootCampNetFullStack.BootCampDAL.Data.Models;
 using BootCampNetFullStack.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 
@@ -74,28 +75,51 @@ namespace BootCampNetFullStack.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetPatient(Guid id)
         {
-            var patient = await _unitOfWork.Patient.Get(x => x.Id == id);
-            if (patient == null) return NotFound();
-            var user = await _userManager.FindByIdAsync(id.ToString());
-            patient.User = user;
+            var patientUser = await _unitOfWork.Patient.Get(x => x.Id == id,u =>u.User);
+            if (patientUser == null) return NotFound();
             var patientResponseDTO = new PatientResponseDTO
             {
-                Addresse = patient.Addresse,
-                Dob = patient.Dob,
-                IsRegistered = patient.IsRegistered,
+                Addresse = patientUser.Addresse,
+                Dob = patientUser.Dob,
+                IsRegistered = patientUser.IsRegistered,
                 User = new UserDTO
                 {
-                    Id = user.Id,
-                    Nom = user.Nom,
-                    Prenom = user.Prenom,
-                    Email = user.Email,
-                    CreatedAt = user.CreatedAt,
-                    LastUpdatedAt = user.LastUpdatedAt,
-                    IsActive = user.IsActive,
-                    Tel = user.Tel,
-                    Role = (await _userManager.GetRolesAsync(user)).FirstOrDefault()
-                }
+                    Id = patientUser.User.Id,
+                    Nom = patientUser.User.Nom,
+                    Prenom = patientUser.User.Prenom,
+                    Email = patientUser.User.Email,
+                    CreatedAt = patientUser.User.CreatedAt,
+                    LastUpdatedAt = patientUser.User.LastUpdatedAt,
+                    IsActive = patientUser.User.IsActive,
+                    Tel = patientUser.User.Tel,
+                    Role = (await _userManager.GetRolesAsync(patientUser.User)).FirstOrDefault()
+                },
+                FullName = $"{patientUser.User.Prenom} {patientUser.User.Nom}"
             };
+            ////var userPatient = await _userManager.Users.Include(x => x.Patients).FirstOrDefaultAsync(k => k.Id == id);
+
+            //if (userPatient == null) return NotFound();
+            //var patientResponseDTO = new PatientResponseDTO();
+            //foreach (var patient in userPatient.Patients)
+            //{
+            //    patientResponseDTO.Addresse = patient.Addresse;
+            //    patientResponseDTO.Dob = patient.Dob;
+            //    patientResponseDTO.IsRegistered = patient.IsRegistered;
+            //    patientResponseDTO.User = new UserDTO
+            //    {
+            //        Id = userPatient.Id,
+            //        Nom = userPatient.Nom,
+            //        Prenom = userPatient.Prenom,
+            //        Email = userPatient.Email,
+            //        CreatedAt = userPatient.CreatedAt,
+            //        LastUpdatedAt = userPatient.LastUpdatedAt,
+            //        IsActive = userPatient.IsActive,
+            //        Tel = userPatient.Tel,
+            //        Role = (await _userManager.GetRolesAsync(userPatient)).FirstOrDefault()
+            //    };
+            //    patientResponseDTO.FullName = $"{userPatient.Prenom} {userPatient.Nom}";
+            //}
+
             return Ok(patientResponseDTO);
         }
         /// <summary>
@@ -139,6 +163,13 @@ namespace BootCampNetFullStack.Controllers
             await _unitOfWork.Save();
 
             return Ok(patientToUpdate);
+        }
+        [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<Patient>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetPatients()
+        {
+            var patients = (await _unitOfWork.Patient.GetAll()).OrderBy(p => p.User.Nom);
+            return Ok(patients);
         }
     }
 }

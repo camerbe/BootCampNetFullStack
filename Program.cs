@@ -15,14 +15,19 @@ var builder = WebApplication.CreateBuilder(args);
 
 var logger = new LoggerConfiguration()
     //.WriteTo.Console()
-    .WriteTo.File("Logs/BootCamp_log.log",rollingInterval:RollingInterval.Day)
+    .WriteTo.File("Logs/BootCamp_log.log", rollingInterval: RollingInterval.Day)
     .MinimumLevel.Information()
     .CreateBootstrapLogger();
 
 builder.Logging.ClearProviders();
 builder.Logging.AddSerilog(logger);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+    options.JsonSerializerOptions.WriteIndented = true;
+
+});
 builder.Services.AddDbContext<BootCampDalContext>(options => options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")
     ));
@@ -32,7 +37,7 @@ builder.Services.AddIdentityCore<User>()
     //.AddTokenProvider<DataProtectorTokenProvider<IdentityUser>>("Dal")
     .AddEntityFrameworkStores<BootCampDalContext>()
     .AddDefaultTokenProviders();
-    
+
 
 builder.Services.Configure<IdentityOptions>(q =>
 {
@@ -45,18 +50,6 @@ builder.Services.Configure<IdentityOptions>(q =>
 
 
 });
-//builder.Services.AddIdentity<User, IdentityRole<Guid>>(q =>
-//{
-//    q.User.RequireUniqueEmail = false;
-//    q.Password.RequireNonAlphanumeric = false;
-//    q.Password.RequireLowercase = false;
-//    q.Password.RequireUppercase = false;
-//    q.Password.RequiredLength = 8;
-//    q.SignIn.RequireConfirmedEmail = true;
-    
-//})
-//    .AddEntityFrameworkStores<BootCampDalContext>()
-//    .AddDefaultTokenProviders();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 //builder.Services.AddAutoMapper<AutoMapperProfile>();
@@ -69,7 +62,15 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
-
+// Seed the database Roles
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    //var context = services.GetRequiredService<BootCampDalContext>();
+    var serviceProvider = scope.ServiceProvider;
+    var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    await RoleSeeder.SeedRoleAsync(roleManager);
+}
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -77,7 +78,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseMiddleware<ExceptionHandlerMiddleware>();  
+app.UseMiddleware<ExceptionHandlerMiddleware>();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace BootCampNetFullStack.Migrations
 {
     /// <inheritdoc />
-    public partial class firstmigration : Migration
+    public partial class NewMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -32,13 +32,13 @@ namespace BootCampNetFullStack.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Nom = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Prenom = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    Role = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     LastUpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    Tel = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
                     PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -54,6 +54,19 @@ namespace BootCampNetFullStack.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Specialites",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Titre = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Specialites", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -182,6 +195,79 @@ namespace BootCampNetFullStack.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Medecins",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Inami = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SpecialiteId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Medecins", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Medecins_AspNetUsers_Id",
+                        column: x => x.Id,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Medecins_Specialites_SpecialiteId",
+                        column: x => x.SpecialiteId,
+                        principalTable: "Specialites",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CrenauxHoraires",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Debut = table.Column<TimeSpan>(type: "time", nullable: false),
+                    Fin = table.Column<TimeSpan>(type: "time", nullable: false),
+                    MedecinId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CrenauxHoraires", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CrenauxHoraires_Medecins_MedecinId",
+                        column: x => x.MedecinId,
+                        principalTable: "Medecins",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RendezVous",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Debut = table.Column<TimeSpan>(type: "time", nullable: false),
+                    Fin = table.Column<TimeSpan>(type: "time", nullable: false),
+                    DateRdv = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    PatientId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    MedecinId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Statut = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RendezVous", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RendezVous_Medecins_MedecinId",
+                        column: x => x.MedecinId,
+                        principalTable: "Medecins",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_RendezVous_Patients_PatientId",
+                        column: x => x.PatientId,
+                        principalTable: "Patients",
+                        principalColumn: "Id");
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -220,6 +306,26 @@ namespace BootCampNetFullStack.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CrenauxHoraires_MedecinId",
+                table: "CrenauxHoraires",
+                column: "MedecinId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Medecins_SpecialiteId",
+                table: "Medecins",
+                column: "SpecialiteId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RendezVous_MedecinId",
+                table: "RendezVous",
+                column: "MedecinId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RendezVous_PatientId",
+                table: "RendezVous",
+                column: "PatientId");
         }
 
         /// <inheritdoc />
@@ -241,10 +347,22 @@ namespace BootCampNetFullStack.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Patients");
+                name: "CrenauxHoraires");
+
+            migrationBuilder.DropTable(
+                name: "RendezVous");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "Medecins");
+
+            migrationBuilder.DropTable(
+                name: "Patients");
+
+            migrationBuilder.DropTable(
+                name: "Specialites");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

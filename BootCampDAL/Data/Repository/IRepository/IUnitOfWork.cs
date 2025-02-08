@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BootCampNetFullStack.BootCampDAL.Data.Repository.IRepository;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +12,8 @@ namespace BootCampDAL.Data.Repository.IRepository
         IPatientRepository Patient { get; }
         IUserRepository User { get; }
         IMedecinRepository Medecin { get; }
+        ISpecialiteRepository Specialite { get; }
+        IRendezVousRepository RendezVous { get; }
         Task Save();
     }
 }

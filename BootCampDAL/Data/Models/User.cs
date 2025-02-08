@@ -18,12 +18,11 @@ namespace BootCampDAL.Data.Models
         [Required]
         public string Prenom { get; set; }
         
-        public string? Email { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? LastUpdatedAt { get; set; }
         public bool IsActive { get; set; } = false;
         public string? Tel { get; set; }
-        public IList<Patient>? Patients { get; set; }
-        public IList<Medecin>? Medecins { get; set; }
+        public IEnumerable<Patient>? Patients { get; set; }
+        public IEnumerable<Medecin>? Medecins { get; set; }
     }
 }
