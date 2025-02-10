@@ -1,4 +1,5 @@
 ﻿using BootCampDAL.Data.DTO;
+using BootCampDAL.Data.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace BootCampNetFullStack.BootCampDAL.Data.DTO

@@ -1,11 +1,9 @@
 ﻿using BootCampDAL.Data.Models;
-using BootCampNetFullStack.BootCampDAL.Data.Models;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
-namespace BootCampNetFullStack.Controllers
+namespace BootCampNetFullStack.BootCampDAL.Data.DTO
 {
-    public class RendezVousRequestDTO
+    public class RendezVousResponseDTO
     {
         public Guid Id { get; set; }
         public TimeSpan Debut { get; set; }
@@ -13,7 +11,8 @@ namespace BootCampNetFullStack.Controllers
         public DateTime DateRdv { get; set; }
         public Guid PatientId { get; set; }
         public Guid MedecinId { get; set; }
-        [Required]
+        public MedecinResponseDTO Medecin { get; set; }
+        public PatientDTO Patient { get; set; }
         public string Statut { get; set; } = "Scheduled";
     }
 }

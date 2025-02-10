@@ -11,6 +11,7 @@ namespace BootCampNetFullStack.Mappings
         {
             CreateMap<UserDTO, User>().ReverseMap();
             CreateMap<User, UserResponseDTO>().ReverseMap();
+            
         }
     }
 }

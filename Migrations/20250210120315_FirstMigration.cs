@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace BootCampNetFullStack.Migrations
 {
     /// <inheritdoc />
-    public partial class NewMigration : Migration
+    public partial class FirstMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -196,6 +196,32 @@ namespace BootCampNetFullStack.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "MedecinResponseDTO",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Inami = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SpecialiteId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    FullName = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MedecinResponseDTO", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_MedecinResponseDTO_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_MedecinResponseDTO_Specialites_SpecialiteId",
+                        column: x => x.SpecialiteId,
+                        principalTable: "Specialites",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Medecins",
                 columns: table => new
                 {
@@ -256,6 +282,7 @@ namespace BootCampNetFullStack.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_RendezVous", x => x.Id);
+                    table.CheckConstraint("CK_RendezVous_Statut", "Statut IN ('Scheduled','Confirmed','Cancelled','Completed')");
                     table.ForeignKey(
                         name: "FK_RendezVous_Medecins_MedecinId",
                         column: x => x.MedecinId,
@@ -313,6 +340,16 @@ namespace BootCampNetFullStack.Migrations
                 column: "MedecinId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_MedecinResponseDTO_SpecialiteId",
+                table: "MedecinResponseDTO",
+                column: "SpecialiteId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MedecinResponseDTO_UserId",
+                table: "MedecinResponseDTO",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Medecins_SpecialiteId",
                 table: "Medecins",
                 column: "SpecialiteId");
@@ -348,6 +385,9 @@ namespace BootCampNetFullStack.Migrations
 
             migrationBuilder.DropTable(
                 name: "CrenauxHoraires");
+
+            migrationBuilder.DropTable(
+                name: "MedecinResponseDTO");
 
             migrationBuilder.DropTable(
                 name: "RendezVous");

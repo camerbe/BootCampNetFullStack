@@ -34,7 +34,6 @@ builder.Services.AddDbContext<BootCampDalContext>(options => options.UseSqlServe
 // Adding Identity services
 builder.Services.AddIdentityCore<User>()
     .AddRoles<IdentityRole<Guid>>()
-    //.AddTokenProvider<DataProtectorTokenProvider<IdentityUser>>("Dal")
     .AddEntityFrameworkStores<BootCampDalContext>()
     .AddDefaultTokenProviders();
 
@@ -54,6 +53,9 @@ builder.Services.Configure<IdentityOptions>(q =>
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 //builder.Services.AddAutoMapper<AutoMapperProfile>();
 
+// Existing code
+builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
+
 //Add Authentication
 builder.Services.AddAuthentication();
 
@@ -62,15 +64,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
-// Seed the database Roles
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    //var context = services.GetRequiredService<BootCampDalContext>();
-    var serviceProvider = scope.ServiceProvider;
-    var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    await RoleSeeder.SeedRoleAsync(roleManager);
-}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

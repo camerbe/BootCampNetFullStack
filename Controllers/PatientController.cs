@@ -18,12 +18,12 @@ namespace BootCampNetFullStack.Controllers
     public class PatientController : ControllerBase
     {
         private readonly UserManager<User> _userManager;
-        private readonly IUnitOfWork _unitOfWork ;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<PatientController> _logger;
 
         public PatientController(
-            UserManager<User> userManager, 
-            IUnitOfWork unitOfWork, 
+            UserManager<User> userManager,
+            IUnitOfWork unitOfWork,
             ILogger<PatientController> logger
             )
         {
@@ -34,14 +34,15 @@ namespace BootCampNetFullStack.Controllers
         [HttpPost]
         public async Task<IActionResult> CreatePatient([FromBody] PatientDTO patientDTO)
         {
-            if (!ModelState.IsValid) {
+            if (!ModelState.IsValid)
+            {
                 return BadRequest();
             }
             var user = new User
             {
-                Nom=patientDTO.Nom.ToUpperCase(),
-                Prenom=patientDTO.Prenom.Capitalize(),
-                Email=patientDTO.Email,
+                Nom = patientDTO.Nom.ToUpperCase(),
+                Prenom = patientDTO.Prenom.Capitalize(),
+                Email = patientDTO.Email,
                 CreatedAt = patientDTO.CreatedAt,
                 LastUpdatedAt = patientDTO.LastUpdatedAt,
                 IsActive = patientDTO.IsActive,
@@ -59,15 +60,35 @@ namespace BootCampNetFullStack.Controllers
 
             var patient = new Patient
             {
-                Id=user.Id,
+                Id = user.Id,
                 Dob = patientDTO.Dob,
                 Addresse = patientDTO.Addresse,
                 IsRegistered = patientDTO.IsRegistered
-                
+
             };
             await _unitOfWork.Patient.Add(patient);
             await _unitOfWork.Save();
-            return Accepted(patient);
+            var patientResponseDTO = new PatientResponseDTO
+            {
+                Addresse = patient.Addresse,
+                Dob = patient.Dob,
+                IsRegistered = patient.IsRegistered,
+                User = new UserDTO
+                {
+                    Id = user.Id,
+                    Nom = user.Nom,
+                    Prenom = user.Prenom,
+                    Email = user.Email,
+                    CreatedAt = user.CreatedAt,
+                    LastUpdatedAt = user.LastUpdatedAt,
+                    IsActive = user.IsActive,
+                    Tel = user.Tel,
+                    Role = (await _userManager.GetRolesAsync(user)).FirstOrDefault()
+                },
+                FullName = $"{user.Prenom} {user.Nom}"
+
+            };
+            return Accepted(patientResponseDTO);
 
         }
         [HttpGet("{id:guid}")]
@@ -75,7 +96,7 @@ namespace BootCampNetFullStack.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetPatient(Guid id)
         {
-            var patientUser = await _unitOfWork.Patient.Get(x => x.Id == id,u =>u.User);
+            var patientUser = await _unitOfWork.Patient.Get(x => x.Id == id, u => u.User);
             if (patientUser == null) return NotFound();
             var patientResponseDTO = new PatientResponseDTO
             {
@@ -96,30 +117,7 @@ namespace BootCampNetFullStack.Controllers
                 },
                 FullName = $"{patientUser.User.Prenom} {patientUser.User.Nom}"
             };
-            ////var userPatient = await _userManager.Users.Include(x => x.Patients).FirstOrDefaultAsync(k => k.Id == id);
-
-            //if (userPatient == null) return NotFound();
-            //var patientResponseDTO = new PatientResponseDTO();
-            //foreach (var patient in userPatient.Patients)
-            //{
-            //    patientResponseDTO.Addresse = patient.Addresse;
-            //    patientResponseDTO.Dob = patient.Dob;
-            //    patientResponseDTO.IsRegistered = patient.IsRegistered;
-            //    patientResponseDTO.User = new UserDTO
-            //    {
-            //        Id = userPatient.Id,
-            //        Nom = userPatient.Nom,
-            //        Prenom = userPatient.Prenom,
-            //        Email = userPatient.Email,
-            //        CreatedAt = userPatient.CreatedAt,
-            //        LastUpdatedAt = userPatient.LastUpdatedAt,
-            //        IsActive = userPatient.IsActive,
-            //        Tel = userPatient.Tel,
-            //        Role = (await _userManager.GetRolesAsync(userPatient)).FirstOrDefault()
-            //    };
-            //    patientResponseDTO.FullName = $"{userPatient.Prenom} {userPatient.Nom}";
-            //}
-
+            
             return Ok(patientResponseDTO);
         }
         /// <summary>
@@ -168,8 +166,37 @@ namespace BootCampNetFullStack.Controllers
         [ProducesResponseType(typeof(IEnumerable<Patient>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetPatients()
         {
-            var patients = (await _unitOfWork.Patient.GetAll()).OrderBy(p => p.User.Nom);
-            return Ok(patients);
+            List<PatientResponseDTO> listPatient = new List<PatientResponseDTO>();
+            var userPatients = _userManager.Users.Include(p=>p.Patients).OrderBy(n=>n.Nom);
+            //var patients = (await _unitOfWork.Patient.GetAll());
+            if (userPatients == null) BadRequest();
+            foreach(User userPatient in userPatients)
+            {
+                foreach (Patient patient in userPatient.Patients)
+                {
+                    var PatientResponseDTO = new PatientResponseDTO
+                    {
+                        Addresse = patient.Addresse,
+                        Dob = patient.Dob,
+                        IsRegistered = patient.IsRegistered,
+                        User = new UserDTO
+                        {
+                            Id = patient.User.Id,
+                            Nom = patient.User.Nom,
+                            Prenom = patient.User.Nom,
+                            Email = patient.User.Email,
+                            CreatedAt = patient.User.CreatedAt,
+                            IsActive = patient.User.IsActive,
+                            Tel = patient.User.Tel,
+                            Role = "Patient"
+                        },
+                        FullName = $"{patient.User.Nom} {patient.User.Prenom}"
+                    };
+                    listPatient.Add(PatientResponseDTO);
+                }
+                
+            }
+            return Ok(listPatient);
         }
     }
 }

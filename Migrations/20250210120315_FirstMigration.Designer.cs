@@ -4,6 +4,7 @@ using BootCampDAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BootCampNetFullStack.Migrations
 {
     [DbContext(typeof(BootCampDalContext))]
-    partial class BootCampDalContextModelSnapshot : ModelSnapshot
+    [Migration("20250210120315_FirstMigration")]
+    partial class FirstMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -279,36 +282,6 @@ namespace BootCampNetFullStack.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("cfc93af6-26ba-45cd-b2fc-b4dc7cf9a04b"),
-                            ConcurrencyStamp = "cfc93af6-26ba-45cd-b2fc-b4dc7cf9a04b",
-                            Name = "Medecin",
-                            NormalizedName = "MEDECIN"
-                        },
-                        new
-                        {
-                            Id = new Guid("60729606-5f65-4b75-9690-4822fc3f5e05"),
-                            ConcurrencyStamp = "60729606-5f65-4b75-9690-4822fc3f5e05",
-                            Name = "Patient",
-                            NormalizedName = "PATIENT"
-                        },
-                        new
-                        {
-                            Id = new Guid("1edeb8db-be10-42d1-af85-d90d3e0d3dce"),
-                            ConcurrencyStamp = "1edeb8db-be10-42d1-af85-d90d3e0d3dce",
-                            Name = "Admin",
-                            NormalizedName = "ADMIN"
-                        },
-                        new
-                        {
-                            Id = new Guid("0b128172-10fc-4e12-bb13-e100c5716ba3"),
-                            ConcurrencyStamp = "0b128172-10fc-4e12-bb13-e100c5716ba3",
-                            Name = "Secretaire",
-                            NormalizedName = "SECRETAIRE"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>

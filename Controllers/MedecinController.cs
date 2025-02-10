@@ -41,7 +41,7 @@ namespace BootCampNetFullStack.Controllers
                 LastUpdatedAt = medecinRequestDTO.LastUpdatedAt,
                 IsActive = medecinRequestDTO.IsActive,
                 Tel = medecinRequestDTO.Tel,
-                
+
             };
             user.Email = medecinRequestDTO.Email ?? medecinRequestDTO.Prenom + medecinRequestDTO.Nom;
             user.EmailConfirmed = medecinRequestDTO.Email.IsNullOrEmpty() ? false : true;
@@ -57,11 +57,30 @@ namespace BootCampNetFullStack.Controllers
                 Id = user.Id,
                 SpecialiteId = medecinRequestDTO.SpecialiteId,
                 Inami = medecinRequestDTO.Inami,
-                 
+
             };
             await _unitOfWork.Medecin.Add(medecin);
             await _unitOfWork.Save();
-            return Accepted(medecin);
+            var MedecinResponseDTO = new MedecinResponseDTO
+            {
+                Inami = medecin.Inami,
+                SpecialiteId = medecin.SpecialiteId,
+                Specialite = await _unitOfWork.Specialite.Get(x => x.Id == medecin.SpecialiteId),
+                User = new UserDTO
+                {
+                    Id = user.Id,
+                    Nom = user.Nom,
+                    Prenom = user.Prenom,
+                    Email = user.Email,
+                    CreatedAt = user.CreatedAt,
+                    LastUpdatedAt = user.LastUpdatedAt,
+                    IsActive = user.IsActive,
+                    Tel = user.Tel,
+                    Role = (await _userManager.GetRolesAsync(user)).FirstOrDefault()
+                },
+                FullName = $"{user.Prenom} {user.Nom}"
+            };
+            return Accepted(MedecinResponseDTO);
         }
 
         [HttpGet("{id:guid}")]
@@ -69,54 +88,33 @@ namespace BootCampNetFullStack.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetMedecin(Guid id)
         {
-            var medecinUser = await _unitOfWork.Medecin.Get(x => x.Id == id,u =>u.User);
-            if (medecinUser == null) return NotFound();
+            var userMedecin = await _userManager.Users.Include(x => x.Medecins).FirstOrDefaultAsync(x => x.Id == id);
+            if (userMedecin == null) return NotFound();
+
+            var medecin = userMedecin.Medecins.FirstOrDefault();
+            if (medecin == null) return NotFound();
+
             var medecinResponseDTO = new MedecinResponseDTO
             {
-                Inami = medecinUser.Inami,
-                SpecialiteId = medecinUser.SpecialiteId,
-                Specialite = await _unitOfWork.Specialite.Get(x => x.Id == medecinUser.SpecialiteId),
+                Inami = medecin.Inami,
+                SpecialiteId = medecin.SpecialiteId,
+                Specialite = await _unitOfWork.Specialite.Get(x => x.Id == medecin.SpecialiteId),
                 User = new UserDTO
                 {
-                    Id = medecinUser.Id,
-                    Nom = medecinUser.User.Nom,
-                    Prenom = medecinUser.User.Prenom,
-                    Email = medecinUser.User.Email,
-                    CreatedAt = medecinUser.User.CreatedAt,
-                    LastUpdatedAt = medecinUser.User.LastUpdatedAt,
-                    IsActive = medecinUser.User.IsActive,
-                    Tel = medecinUser.User.Tel,
-                    Role = (await _userManager.GetRolesAsync(medecinUser.User)).FirstOrDefault()
+                    Id = userMedecin.Id,
+                    Nom = userMedecin.Nom,
+                    Prenom = userMedecin.Prenom,
+                    Email = userMedecin.Email,
+                    CreatedAt = userMedecin.CreatedAt,
+                    LastUpdatedAt = userMedecin.LastUpdatedAt,
+                    IsActive = userMedecin.IsActive,
+                    Tel = userMedecin.Tel,
+                    Role = (await _userManager.GetRolesAsync(userMedecin)).FirstOrDefault()
                 },
-                FullName = $"{medecinUser.User.Prenom} {medecinUser.User.Nom}"
+                FullName = $"{userMedecin.Prenom} {userMedecin.Nom}"
             };
-            //var userMedecin = await _userManager.Users.Include(x => x.Medecins).FirstOrDefaultAsync(x => x.Id == id);
 
-            //if (userMedecin == null) return NotFound();
-            //var medecinResponseDTO = new MedecinResponseDTO();
-            //foreach (var toubib in userMedecin.Medecins)
-            //{
-
-            //    medecinResponseDTO.Inami = toubib.Inami;
-            //    medecinResponseDTO.SpecialiteId = toubib.SpecialiteId;
-            //    medecinResponseDTO.Specialite = await _unitOfWork.Specialite.Get(x => x.Id == toubib.SpecialiteId);
-            //    medecinResponseDTO.User = new UserDTO
-            //    {
-            //          Id = userMedecin.Id,
-            //          Nom = userMedecin.Nom,
-            //          Prenom = userMedecin.Prenom,
-            //          Email = userMedecin.Email,
-            //          CreatedAt = userMedecin.CreatedAt,
-            //          LastUpdatedAt = userMedecin.LastUpdatedAt,
-            //          IsActive = userMedecin.IsActive,
-            //          Tel = userMedecin.Tel,
-            //          Role = (await _userManager.GetRolesAsync(userMedecin)).FirstOrDefault()
-            //    };
-            //    medecinResponseDTO.FullName = $"{userMedecin.Prenom} {userMedecin.Nom}";
-
-            //}
-
-            return Accepted(medecinResponseDTO);
+            return Ok(medecinResponseDTO);
         }
         /// <summary>
         /// Deletes a user with the specified unique identifier.
@@ -162,8 +160,41 @@ namespace BootCampNetFullStack.Controllers
         [ProducesResponseType(typeof(IEnumerable<Medecin>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetMedecins()
         {
-            var medecins = (await _unitOfWork.Medecin.GetAll()).OrderBy(x=>x.User.Nom);
-            return Accepted(medecins);
+            //var medecins = (await _unitOfWork.Medecin.GetAll()).OrderBy(x => x.User.Nom);
+            //return Accepted(medecins);
+            var userMedecins = _userManager.Users.Include(x => x.Medecins).OrderBy(n => n.Nom);
+            List<MedecinResponseDTO> listMedecin = new List<MedecinResponseDTO>();
+            if (userMedecins != null)
+            {
+                foreach (var userMedecin in userMedecins)
+                {
+                    var medecin = userMedecin.Medecins.FirstOrDefault();
+                    if (medecin != null)
+                    {
+                        var medecinResponseDTO = new MedecinResponseDTO
+                        {
+                            Inami = medecin.Inami,
+                            SpecialiteId = medecin.SpecialiteId,
+                            Specialite = await _unitOfWork.Specialite.Get(x => x.Id == medecin.SpecialiteId),
+                            User = new UserDTO
+                            {
+                                Id = userMedecin.Id,
+                                Nom = userMedecin.Nom,
+                                Prenom = userMedecin.Prenom,
+                                Email = userMedecin.Email,
+                                CreatedAt = userMedecin.CreatedAt,
+                                LastUpdatedAt = userMedecin.LastUpdatedAt,
+                                IsActive = userMedecin.IsActive,
+                                Tel = userMedecin.Tel,
+                                Role = "Medecin"//(await _userManager.GetRolesAsync(userMedecin)).FirstOrDefault()
+                            },
+                            FullName = $"{userMedecin.Prenom} {userMedecin.Nom}"
+                        };
+                        listMedecin.Add(medecinResponseDTO);
+                    }
+                }
+            }
+            return Accepted(listMedecin);
         }
     }
 }

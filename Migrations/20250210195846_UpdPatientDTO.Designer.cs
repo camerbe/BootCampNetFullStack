@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BootCampNetFullStack.Migrations
 {
     [DbContext(typeof(BootCampDalContext))]
-    [Migration("20250208124625_NewMigration")]
-    partial class NewMigration
+    [Migration("20250210195846_UpdPatientDTO")]
+    partial class UpdPatientDTO
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -99,7 +99,10 @@ namespace BootCampNetFullStack.Migrations
 
                     b.HasIndex("PatientId");
 
-                    b.ToTable("RendezVous");
+                    b.ToTable("RendezVous", t =>
+                        {
+                            t.HasCheckConstraint("CK_RendezVous_Statut", "Statut IN ('Scheduled','Confirmed','Cancelled','Completed')");
+                        });
                 });
 
             modelBuilder.Entity("BootCampDAL.Data.Models.Specialite", b =>
@@ -206,6 +209,34 @@ namespace BootCampNetFullStack.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("BootCampNetFullStack.BootCampDAL.Data.DTO.MedecinResponseDTO", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Inami")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("SpecialiteId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SpecialiteId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("MedecinResponseDTO");
+                });
+
             modelBuilder.Entity("BootCampNetFullStack.BootCampDAL.Data.Models.Patient", b =>
                 {
                     b.Property<Guid>("Id")
@@ -251,6 +282,36 @@ namespace BootCampNetFullStack.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("cfc93af6-26ba-45cd-b2fc-b4dc7cf9a04b"),
+                            ConcurrencyStamp = "cfc93af6-26ba-45cd-b2fc-b4dc7cf9a04b",
+                            Name = "Medecin",
+                            NormalizedName = "MEDECIN"
+                        },
+                        new
+                        {
+                            Id = new Guid("60729606-5f65-4b75-9690-4822fc3f5e05"),
+                            ConcurrencyStamp = "60729606-5f65-4b75-9690-4822fc3f5e05",
+                            Name = "Patient",
+                            NormalizedName = "PATIENT"
+                        },
+                        new
+                        {
+                            Id = new Guid("1edeb8db-be10-42d1-af85-d90d3e0d3dce"),
+                            ConcurrencyStamp = "1edeb8db-be10-42d1-af85-d90d3e0d3dce",
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
+                        },
+                        new
+                        {
+                            Id = new Guid("0b128172-10fc-4e12-bb13-e100c5716ba3"),
+                            ConcurrencyStamp = "0b128172-10fc-4e12-bb13-e100c5716ba3",
+                            Name = "Secretaire",
+                            NormalizedName = "SECRETAIRE"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -376,7 +437,7 @@ namespace BootCampNetFullStack.Migrations
                         .IsRequired();
 
                     b.HasOne("BootCampDAL.Data.Models.Specialite", "Specialite")
-                        .WithMany("Medecins")
+                        .WithMany()
                         .HasForeignKey("SpecialiteId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -401,6 +462,23 @@ namespace BootCampNetFullStack.Migrations
                     b.Navigation("Medecin");
 
                     b.Navigation("Patient");
+                });
+
+            modelBuilder.Entity("BootCampNetFullStack.BootCampDAL.Data.DTO.MedecinResponseDTO", b =>
+                {
+                    b.HasOne("BootCampDAL.Data.Models.Specialite", "Specialite")
+                        .WithMany("Medecins")
+                        .HasForeignKey("SpecialiteId");
+
+                    b.HasOne("BootCampDAL.Data.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Specialite");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("BootCampNetFullStack.BootCampDAL.Data.Models.Patient", b =>
