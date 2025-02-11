@@ -4,6 +4,7 @@ using BootCampDAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BootCampNetFullStack.Migrations
 {
     [DbContext(typeof(BootCampDalContext))]
-    partial class BootCampDalContextModelSnapshot : ModelSnapshot
+    [Migration("20250211183957_AddConstraintToRDV")]
+    partial class AddConstraintToRDV
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

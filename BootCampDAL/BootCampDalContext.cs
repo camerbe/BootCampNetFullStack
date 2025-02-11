@@ -23,6 +23,7 @@ namespace BootCampDAL
             builder.Entity<RendezVous>(rdv =>
             {
                 rdv.ToTable(t => t.HasCheckConstraint("CK_RendezVous_Statut", "Statut IN ('Scheduled','Confirmed','Cancelled','Completed')"));
+                rdv.ToTable(t => t.HasCheckConstraint("CK_RendezVous_DateRdv", "DateRdv > SYSDATETIME()"));
             });
 
             //builder.Entity<Medecin>()

@@ -32,16 +32,10 @@ namespace BootCampDAL.Data.Repository
              return (IEnumerable<T>)entity;
         }
 
-        public async Task<T?> Get(Expression<Func<T, bool>> expression, params Expression<Func<T, object>>[] includes)
+        public async Task<T?> Get(Expression<Func<T, bool>> expression)
         {
-            IQueryable<T> queryable = _db;
-            if (includes != null)
-            {
-                foreach (var include in includes)
-                {
-                    queryable = queryable.Include(include);
-                }
-            }
+            IQueryable<T> queryable = _db.Where(expression);
+            
             return await queryable.FirstOrDefaultAsync(expression);
         }
 

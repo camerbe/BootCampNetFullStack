@@ -160,9 +160,7 @@ namespace BootCampNetFullStack.Controllers
         [ProducesResponseType(typeof(IEnumerable<Medecin>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetMedecins()
         {
-            //var medecins = (await _unitOfWork.Medecin.GetAll()).OrderBy(x => x.User.Nom);
-            //return Accepted(medecins);
-            var userMedecins = _userManager.Users.Include(x => x.Medecins).OrderBy(n => n.Nom);
+            var userMedecins = _userManager.Users.Include(x => x.Medecins).ThenInclude(s => s.Specialite).OrderBy(n =>n.Nom);
             List<MedecinResponseDTO> listMedecin = new List<MedecinResponseDTO>();
             if (userMedecins != null)
             {
@@ -175,7 +173,7 @@ namespace BootCampNetFullStack.Controllers
                         {
                             Inami = medecin.Inami,
                             SpecialiteId = medecin.SpecialiteId,
-                            Specialite = await _unitOfWork.Specialite.Get(x => x.Id == medecin.SpecialiteId),
+                            Specialite = medecin.Specialite,
                             User = new UserDTO
                             {
                                 Id = userMedecin.Id,
