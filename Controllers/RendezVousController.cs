@@ -33,7 +33,7 @@ namespace BootCampNetFullStack.Controllers
             };
             await _unitOfWork.RendezVous.Add(rendezVous);
             await _unitOfWork.Save();
-            var insertedRendezVous = await _unitOfWork.RendezVous.Get(r => r.Id == rendezVous.Id, r => r.Patient.Then, r => r.Medecin); // Fix the method call
+            var insertedRendezVous = await _unitOfWork.RendezVous.Get(r => r.Id == rendezVous.Id, r => r.Patient,up => up.Patient.User, r => r.Medecin,u =>u.Medecin.User); // Fix the method call
 
             if (insertedRendezVous == null) return Accepted(rendezVous);
             RendezVousResponseDTO rdvResponseDTO = new RendezVousResponseDTO

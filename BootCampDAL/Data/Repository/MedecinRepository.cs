@@ -13,10 +13,7 @@ namespace BootCampDAL.Data.Repository
     class MedecinRepository : Repository<Medecin>, IMedecinRepository
     {
         private readonly BootCampDalContext _context;
-        public MedecinRepository(BootCampDalContext context) : base(context)
-        {
-            _context = context;
-        }
+        public MedecinRepository(BootCampDalContext context) : base(context) => _context = context;
 
         public async Task Update(Medecin medecin)
         {

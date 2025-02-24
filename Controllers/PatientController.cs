@@ -4,10 +4,13 @@ using BootCampDAL.Data.Repository.IRepository;
 using BootCampNetFullStack.BootCampDAL.Data.DTO;
 using BootCampNetFullStack.BootCampDAL.Data.Models;
 using BootCampNetFullStack.Extensions;
+using BootCampNetFullStack.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 
 
@@ -20,16 +23,23 @@ namespace BootCampNetFullStack.Controllers
         private readonly UserManager<User> _userManager;
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<PatientController> _logger;
-
+        private readonly string _role;
+        private readonly EmailService _emailService;
+        private readonly IConfiguration _config;
         public PatientController(
             UserManager<User> userManager,
             IUnitOfWork unitOfWork,
-            ILogger<PatientController> logger
+            ILogger<PatientController> logger,
+            EmailService emailService,
+            IConfiguration config
             )
         {
             _userManager = userManager;
             _unitOfWork = unitOfWork;
             _logger = logger;
+            _role = "Patient";
+            _emailService = emailService;
+            _config = config;
         }
         [HttpPost]
         public async Task<IActionResult> CreatePatient([FromBody] PatientDTO patientDTO)
@@ -50,7 +60,7 @@ namespace BootCampNetFullStack.Controllers
 
             };
             user.Email = patientDTO.Email ?? patientDTO.Prenom + patientDTO.Nom;
-            user.EmailConfirmed = patientDTO.Email.IsNullOrEmpty() ? false : true;
+            //user.EmailConfirmed = patientDTO.Email.IsNullOrEmpty() ? false : true;
             user.UserName = patientDTO.Email ?? patientDTO.Prenom + patientDTO.Nom;
             var result = await _userManager.CreateAsync(user, patientDTO.Password);
             if (!result.Succeeded) return BadRequest();
@@ -83,11 +93,12 @@ namespace BootCampNetFullStack.Controllers
                     LastUpdatedAt = user.LastUpdatedAt,
                     IsActive = user.IsActive,
                     Tel = user.Tel,
-                    Role = (await _userManager.GetRolesAsync(user)).FirstOrDefault()
+                    Role = _role
                 },
                 FullName = $"{user.Prenom} {user.Nom}"
 
             };
+            await  _emailService.SendConfirmedEmailAsync(user);
             return Accepted(patientResponseDTO);
 
         }
@@ -166,7 +177,7 @@ namespace BootCampNetFullStack.Controllers
         [ProducesResponseType(typeof(IEnumerable<Patient>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetPatients()
         {
-            List<PatientResponseDTO> listPatient = new List<PatientResponseDTO>();
+            List<PatientResponseDTO> listPatient = [];
             var userPatients = _userManager.Users.Include(p=>p.Patients).OrderBy(n=>n.Nom);
             //var patients = (await _unitOfWork.Patient.GetAll());
             if (userPatients == null) BadRequest();
@@ -198,5 +209,19 @@ namespace BootCampNetFullStack.Controllers
             }
             return Ok(listPatient);
         }
+        #region Helper
+        //private async Task<bool> SendConfirmedEmailAsync(User user)
+        //{
+        //    var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        //    token = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
+        //    var url = $"{_config["JWT:ClientUrl"]}/{_config["JWT:ConfirmationEmailPath"]}?token={token}&email={user.Email}";
+        //    var body = $"<p>Bonjour {user.Prenom} {user.Nom}</p>" +
+        //                "<<p>Afin de pouvoir activer votre compte, nous devons valider votre adresse email. Cliquez simplement sur le lien :</p>" +
+        //                $"<p><a href='{url}'>Activer mon compte</a></p>"+
+        //                "<p>Bienvenue à bord !</p>";
+        //    var emailSend = new EmailSendDTO(user.Email, "Confirmation", body);
+        //    return  await _emailService.SendEmailAsync(emailSend);
+        //}   
+        #endregion
     }
 }

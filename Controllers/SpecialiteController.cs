@@ -55,7 +55,7 @@ namespace BootCampNetFullStack.Controllers
         [ProducesResponseType(typeof(IEnumerable<Specialite>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetSpecialites()
         {
-            var specialites = (await _unitOfWork.Specialite.GetAll()).OrderBy(s => s.Titre);
+            var specialites = (await _unitOfWork.Specialite.GetAll(null,null)).OrderBy(s => s.Titre);
             return Ok(specialites);
         }
         [HttpGet("{id:guid}")]

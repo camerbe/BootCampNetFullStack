@@ -42,7 +42,8 @@ namespace BootCampNetFullStack.Controllers
         [ProducesResponseType(typeof(IEnumerable<User>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetUsers() 
         {
-            var users = _unitOfWork.User.GetAll();
+            var users = _unitOfWork.User.GetAll(null,p=>p.Patients,m => m.Medecins);
+            //var userDTO = 
             return Ok(users);
             
         }
@@ -72,7 +73,7 @@ namespace BootCampNetFullStack.Controllers
                 Tel = usrdto.Tel,
             };
             user.Email = usrdto.Email ?? usrdto.Prenom + usrdto.Nom;
-            user.EmailConfirmed = usrdto.Email.IsNullOrEmpty() ? false : true;
+            user.EmailConfirmed = !usrdto.Email.IsNullOrEmpty();
             user.UserName = usrdto.Email ?? usrdto.Prenom + usrdto.Nom;
             var result = await _userManager.CreateAsync(user, usrdto.Password);
             if (!result.Succeeded) return BadRequest();

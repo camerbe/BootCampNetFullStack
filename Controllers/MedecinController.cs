@@ -3,6 +3,7 @@ using BootCampDAL.Data.Models;
 using BootCampDAL.Data.Repository.IRepository;
 using BootCampNetFullStack.BootCampDAL.Data.DTO;
 using BootCampNetFullStack.Extensions;
+using BootCampNetFullStack.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -13,21 +14,18 @@ namespace BootCampNetFullStack.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class MedecinController : ControllerBase
+    public class MedecinController(
+        ILogger<MedecinController> logger,
+        IUnitOfWork unitOfWork,
+        EmailService _emailService,
+        UserManager<User> userManager
+            ) : ControllerBase
     {
-        private readonly ILogger<MedecinController> _logger;
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly UserManager<User> _userManager;
-        public MedecinController(
-            ILogger<MedecinController> logger,
-            IUnitOfWork unitOfWork,
-            UserManager<User> userManager
-            )
-        {
-            _logger = logger;
-            _unitOfWork = unitOfWork;
-            _userManager = userManager;
-        }
+        private readonly ILogger<MedecinController> _logger = logger;
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
+        private readonly UserManager<User> _userManager = userManager;
+        private readonly EmailService _emailService;
+
         [HttpPost]
         public async Task<IActionResult> CreateMedecin([FromBody] MedecinRequestDTO medecinRequestDTO)
         {
@@ -44,7 +42,7 @@ namespace BootCampNetFullStack.Controllers
 
             };
             user.Email = medecinRequestDTO.Email ?? medecinRequestDTO.Prenom + medecinRequestDTO.Nom;
-            user.EmailConfirmed = medecinRequestDTO.Email.IsNullOrEmpty() ? false : true;
+            //user.EmailConfirmed = medecinRequestDTO.Email.IsNullOrEmpty() ? false : true;
             user.UserName = medecinRequestDTO.Email ?? medecinRequestDTO.Prenom + medecinRequestDTO.Nom;
             var result = await _userManager.CreateAsync(user, medecinRequestDTO.Password);
 
@@ -61,6 +59,8 @@ namespace BootCampNetFullStack.Controllers
             };
             await _unitOfWork.Medecin.Add(medecin);
             await _unitOfWork.Save();
+            
+            
             var MedecinResponseDTO = new MedecinResponseDTO
             {
                 Inami = medecin.Inami,
@@ -76,10 +76,14 @@ namespace BootCampNetFullStack.Controllers
                     LastUpdatedAt = user.LastUpdatedAt,
                     IsActive = user.IsActive,
                     Tel = user.Tel,
-                    Role = (await _userManager.GetRolesAsync(user)).FirstOrDefault()
+                    Role ="Medecin"
                 },
                 FullName = $"{user.Prenom} {user.Nom}"
             };
+            if (!user.Email.IsNullOrEmpty())
+            {
+                _emailService.SendConfirmedEmailAsync(user);
+            }
             return Accepted(MedecinResponseDTO);
         }
 
@@ -161,7 +165,7 @@ namespace BootCampNetFullStack.Controllers
         public async Task<IActionResult> GetMedecins()
         {
             var userMedecins = _userManager.Users.Include(x => x.Medecins).ThenInclude(s => s.Specialite).OrderBy(n =>n.Nom);
-            List<MedecinResponseDTO> listMedecin = new List<MedecinResponseDTO>();
+            List<MedecinResponseDTO> listMedecin = [];
             if (userMedecins != null)
             {
                 foreach (var userMedecin in userMedecins)

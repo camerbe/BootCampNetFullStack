@@ -4,6 +4,7 @@ using BootCampDAL.Data.Repository;
 using BootCampDAL.Data.Repository.IRepository;
 using BootCampNetFullStack.Mappings;
 using BootCampNetFullStack.Middlewares;
+using BootCampNetFullStack.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -51,7 +52,9 @@ builder.Services.Configure<IdentityOptions>(q =>
 });
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<EmailService>();
 //builder.Services.AddAutoMapper<AutoMapperProfile>();
+
 
 // Existing code
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
